@@ -3,8 +3,16 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "A website for testing",
+    "tagline": "A documentation website for Learnplex",
     "docs": {
+      "about": {
+        "title": "About",
+        "sidebar_label": "About"
+      },
+      "contributing": {
+        "title": "Contributing",
+        "sidebar_label": "Contributing"
+      },
       "doc1": {
         "title": "Latin-ish",
         "sidebar_label": "Example Page"
@@ -20,18 +28,22 @@
       },
       "doc5": {
         "title": "Fifth Document"
+      },
+      "installation": {
+        "title": "Installation",
+        "sidebar_label": "Installation"
+      },
+      "prerequisites": {
+        "title": "Prerequisites",
+        "sidebar_label": "Prerequisites"
       }
     },
     "links": {
-      "Docs": "Docs",
-      "API": "API",
-      "Help": "Help",
-      "Blog": "Blog"
+      "Getting Started": "Getting Started"
     },
     "categories": {
-      "Docusaurus": "Docusaurus",
-      "First Category": "First Category",
-      "Second Category": "Second Category"
+      "Getting Started": "Getting Started",
+      "First Category": "First Category"
     }
   },
   "pages-strings": {
