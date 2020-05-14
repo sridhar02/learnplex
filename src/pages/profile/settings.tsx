@@ -17,7 +17,7 @@ import { useUser } from '../../lib/hooks/useUser'
 import InternalServerError from '../../components/result/InternalServerError'
 import { FORM_LAYOUT, FORM_TAIL_LAYOUT } from '../../constants'
 import { SEO } from '../../components/SEO'
-import Profile from './../profile/index'
+import Enrollments from '../../components/user/Enrollments'
 
 export default function ProfileSettings() {
   const { user, fetching, error } = useUser()
@@ -284,7 +284,7 @@ export default function ProfileSettings() {
               </Form.Item>
             </Form>
           )}
-          {selectedKey === ENROLLMENTS && <Profile />}
+          {selectedKey === ENROLLMENTS && <Enrollments />}
         </Col>
       </Row>
     </>
