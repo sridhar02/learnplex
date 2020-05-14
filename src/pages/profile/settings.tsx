@@ -17,12 +17,14 @@ import { useUser } from '../../lib/hooks/useUser'
 import InternalServerError from '../../components/result/InternalServerError'
 import { FORM_LAYOUT, FORM_TAIL_LAYOUT } from '../../constants'
 import { SEO } from '../../components/SEO'
+import Profile from './../profile/index'
 
 export default function ProfileSettings() {
   const { user, fetching, error } = useUser()
 
   const BASIC = 'basic'
   const SECURITY = 'security'
+  const ENROLLMENTS = 'enrollments'
   const [selectedKey, setSelectedKey] = useState(BASIC)
 
   const UPDATE_USER_MUTATION = `
@@ -282,6 +284,7 @@ export default function ProfileSettings() {
               </Form.Item>
             </Form>
           )}
+          {selectedKey === ENROLLMENTS && <Profile />}
         </Col>
       </Row>
     </>
