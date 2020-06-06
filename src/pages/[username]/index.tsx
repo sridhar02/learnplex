@@ -18,13 +18,13 @@ import {
 import { useRouter } from 'next/router'
 
 import { SEO } from '../../components/SEO'
-import { useQuery } from 'urql'
 import { User, Resource } from '../../graphql/types'
 import { getUserWithProfileByUsername } from '../../graphql/queries/user'
 import PageNotFound from '../../components/result/PageNotFound'
 import { useAuthUser } from '../../lib/store'
 import EditProfileModal from '../../components/user/EditProfileModal'
 import ResourceCards from '../../components/learn/ResourceCards'
+import { getAllResources } from '../../utils/getAllResources'
 
 const openUrlInNewTab = (url: string) => {
   window.open(url, '_blank')
@@ -38,36 +38,6 @@ export default function UserProfile() {
   const [error, setError] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [resources, setResources] = useState([] as Resource[])
-  const ALL_PUBLISHED_RESOURCES = `
-    query {
-      allPublishedResources {
-        id
-        title
-        description
-        slug
-        user {
-          username
-        }
-        topic {
-          title
-          slug
-        }
-        firstPageSlugsPath
-        verified
-        createdDate
-      }
-    }
-  `
-
-  const [{ data, fetching, error: resourcesError }] = useQuery({
-    query: ALL_PUBLISHED_RESOURCES,
-  })
-
-  useEffect(() => {
-    if (!fetching && resourcesError && data && data.allPublishedResources) {
-      setResources(data.allPublishedResources)
-    }
-  }, [data, error, fetching])
 
   useEffect(() => {
     getUserWithProfileByUsername({ username }).then((result) => {
@@ -78,6 +48,16 @@ export default function UserProfile() {
       setUser(result)
     })
   }, [username])
+
+  useEffect(() => {
+    getAllResources().then((result) => {
+      if (result.error) {
+        message.error(result.message)
+      } else {
+        setResources(result)
+      }
+    })
+  }, [])
 
   if (error) {
     return <PageNotFound message={'Invalid username'} />
