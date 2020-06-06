@@ -25,6 +25,7 @@ import { useAuthUser } from '../../lib/store'
 import EditProfileModal from '../../components/user/EditProfileModal'
 import ResourceCards from '../../components/learn/ResourceCards'
 import { getAllResources } from '../../utils/getAllResources'
+import { client } from '../../utils/urqlClient'
 
 const openUrlInNewTab = (url: string) => {
   window.open(url, '_blank')
@@ -39,6 +40,27 @@ export default function UserProfile() {
   const [showModal, setShowModal] = useState(false)
   const [resources, setResources] = useState([] as Resource[])
 
+  const RESOURCES_QUERY = `
+    query {
+      resources {
+        id
+        title
+        description
+        slug
+        user {
+          username
+        }
+        topic {
+          title
+          slug
+        }
+        firstPageSlugsPath
+        verified
+        published
+        createdDate
+      }
+    }
+  `
   useEffect(() => {
     getUserWithProfileByUsername({ username }).then((result) => {
       if (result.error) {
@@ -50,14 +72,17 @@ export default function UserProfile() {
   }, [username])
 
   useEffect(() => {
-    getAllResources().then((result) => {
-      if (result.error) {
-        message.error(result.message)
-      } else {
-        setResources(result)
-      }
-    })
-  }, [])
+    client
+      .query(RESOURCES_QUERY)
+      .toPromise()
+      .then((result) => {
+        if (result.error) {
+          message.error(result.error.message)
+        } else {
+          setResources(result.data.resources)
+        }
+      })
+  }, [RESOURCES_QUERY])
 
   if (error) {
     return <PageNotFound message={'Invalid username'} />
