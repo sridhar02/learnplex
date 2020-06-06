@@ -18,11 +18,13 @@ import {
 import { useRouter } from 'next/router'
 
 import { SEO } from '../../components/SEO'
-import { User } from '../../graphql/types'
+import { useQuery } from 'urql'
+import { User, Resource } from '../../graphql/types'
 import { getUserWithProfileByUsername } from '../../graphql/queries/user'
 import PageNotFound from '../../components/result/PageNotFound'
 import { useAuthUser } from '../../lib/store'
 import EditProfileModal from '../../components/user/EditProfileModal'
+import ResourceCards from '../../components/learn/ResourceCards'
 
 const openUrlInNewTab = (url: string) => {
   window.open(url, '_blank')
@@ -35,6 +37,38 @@ export default function UserProfile() {
   const [user, setUser] = useState<Partial<User> | null | undefined>(null)
   const [error, setError] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [resources, setResources] = useState([] as Resource[])
+  const ALL_PUBLISHED_RESOURCES = `
+    query {
+      allPublishedResources {
+        id
+        title
+        description
+        slug
+        user {
+          username
+        }
+        topic {
+          title
+          slug
+        }
+        firstPageSlugsPath
+        verified
+        createdDate
+      }
+    }
+  `
+
+  const [{ data, fetching }] = useQuery({
+    query: ALL_PUBLISHED_RESOURCES,
+  })
+
+  useEffect(() => {
+    if (!fetching && data && data.allPublishedResources) {
+      setResources(data.allPublishedResources)
+    }
+  }, [data, error, fetching])
+
   useEffect(() => {
     getUserWithProfileByUsername({ username }).then((result) => {
       if (result.error) {
@@ -53,7 +87,7 @@ export default function UserProfile() {
     return <Skeleton active={true} />
   }
 
-  console.log({ user })
+  console.log({ resources })
 
   return (
     <>
@@ -64,6 +98,7 @@ export default function UserProfile() {
         style={{
           border: '2px solid #0051d3',
           boxShadow: '5px 6px 0px #0051d3',
+          marginBottom: '20px',
         }}
       >
         <Col>
@@ -189,6 +224,7 @@ export default function UserProfile() {
         setShowModal={setShowModal}
         user={user}
       />
+      <ResourceCards resources={resources} />
     </>
   )
 }
