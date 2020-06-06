@@ -59,12 +59,12 @@ export default function UserProfile() {
     }
   `
 
-  const [{ data, fetching }] = useQuery({
+  const [{ data, fetching, error: resourcesError }] = useQuery({
     query: ALL_PUBLISHED_RESOURCES,
   })
 
   useEffect(() => {
-    if (!fetching && data && data.allPublishedResources) {
+    if (!fetching && resourcesError && data && data.allPublishedResources) {
       setResources(data.allPublishedResources)
     }
   }, [data, error, fetching])
