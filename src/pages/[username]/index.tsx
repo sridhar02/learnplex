@@ -41,8 +41,8 @@ export default function UserProfile() {
   const [userProgressList, setUserProgressList] = useState([] as Progress[])
 
   const RESOURCES_QUERY = `
-    query {
-      resources {
+    query($username: String!) {
+      resourcesByUsername(username: $username) {
         id
         title
         description
@@ -95,16 +95,16 @@ export default function UserProfile() {
 
   useEffect(() => {
     client
-      .query(RESOURCES_QUERY)
+      .query(RESOURCES_QUERY, { username })
       .toPromise()
       .then((result) => {
         if (result.error) {
           message.error(result.error.message)
         } else {
-          setResources(result.data.resources)
+          setResources(result.data.resourcesByUsername)
         }
       })
-  }, [RESOURCES_QUERY])
+  }, [username])
 
   useEffect(() => {
     client
@@ -132,6 +132,7 @@ export default function UserProfile() {
     (progress: Progress) => progress.resource
   )
 
+  console.log(resources && resources)
   return (
     <>
       <SEO title={user.name ?? ''} />
