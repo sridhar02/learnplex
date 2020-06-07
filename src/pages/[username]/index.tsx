@@ -18,13 +18,12 @@ import {
 import { useRouter } from 'next/router'
 
 import { SEO } from '../../components/SEO'
-import { User, Resource } from '../../graphql/types'
+import { User, Resource, Progress } from '../../graphql/types'
 import { getUserWithProfileByUsername } from '../../graphql/queries/user'
 import PageNotFound from '../../components/result/PageNotFound'
 import { useAuthUser } from '../../lib/store'
 import EditProfileModal from '../../components/user/EditProfileModal'
 import ResourceCards from '../../components/learn/ResourceCards'
-import { getAllResources } from '../../utils/getAllResources'
 import { client } from '../../utils/urqlClient'
 
 const openUrlInNewTab = (url: string) => {
@@ -39,6 +38,7 @@ export default function UserProfile() {
   const [error, setError] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [resources, setResources] = useState([] as Resource[])
+  const [userProgressList, setUserProgressList] = useState([] as Progress[])
 
   const RESOURCES_QUERY = `
     query {
@@ -61,6 +61,28 @@ export default function UserProfile() {
       }
     }
   `
+  const USER_PROGRESS_LIST_QUERY = `
+    query {
+      userProgressList {
+        resource {
+          id
+          title
+          description
+          slug
+          user {
+            username
+          }
+          topic {
+            title
+            slug
+          }
+          firstPageSlugsPath
+          verified
+        }
+      }
+    }
+  `
+
   useEffect(() => {
     getUserWithProfileByUsername({ username }).then((result) => {
       if (result.error) {
@@ -84,6 +106,20 @@ export default function UserProfile() {
       })
   }, [RESOURCES_QUERY])
 
+  useEffect(() => {
+    client
+      .query(USER_PROGRESS_LIST_QUERY)
+      .toPromise()
+      .then((result) => {
+        if (result.error) {
+          message.error(result.error.message)
+        } else {
+          console.log(result.data)
+          setUserProgressList(result.data.userProgressList)
+        }
+      })
+  }, [USER_PROGRESS_LIST_QUERY])
+
   if (error) {
     return <PageNotFound message={'Invalid username'} />
   }
@@ -92,7 +128,9 @@ export default function UserProfile() {
     return <Skeleton active={true} />
   }
 
-  console.log({ resources })
+  const UserResources = userProgressList.map(
+    (progress: Progress) => progress.resource
+  )
 
   return (
     <>
@@ -229,6 +267,17 @@ export default function UserProfile() {
         setShowModal={setShowModal}
         user={user}
       />
+      <Typography.Title>
+        {loggedInUser
+          ? `Resource you are learning`
+          : `Resources ${user.username} is learning`}{' '}
+      </Typography.Title>
+      <ResourceCards resources={UserResources} />
+      <Typography.Title>
+        {loggedInUser
+          ? `Resources created by you`
+          : `Resources created by ${user.username}`}
+      </Typography.Title>
       <ResourceCards resources={resources} />
     </>
   )
