@@ -62,8 +62,8 @@ export default function UserProfile() {
     }
   `
   const USER_PROGRESS_LIST_QUERY = `
-    query {
-      userProgressList {
+    query($username: String!) {
+      userProgressListByUsername(username: $username) {
         resource {
           id
           title
@@ -104,21 +104,21 @@ export default function UserProfile() {
           setResources(result.data.resourcesByUsername)
         }
       })
-  }, [username])
+  }, [RESOURCES_QUERY, username])
 
   useEffect(() => {
     client
-      .query(USER_PROGRESS_LIST_QUERY)
+      .query(USER_PROGRESS_LIST_QUERY, { username })
       .toPromise()
       .then((result) => {
         if (result.error) {
           message.error(result.error.message)
         } else {
           console.log(result.data)
-          setUserProgressList(result.data.userProgressList)
+          setUserProgressList(result.data.userProgressListByUsername)
         }
       })
-  }, [USER_PROGRESS_LIST_QUERY])
+  }, [USER_PROGRESS_LIST_QUERY, username])
 
   if (error) {
     return <PageNotFound message={'Invalid username'} />
@@ -132,7 +132,6 @@ export default function UserProfile() {
     (progress: Progress) => progress.resource
   )
 
-  console.log(resources && resources)
   return (
     <>
       <SEO title={user.name ?? ''} />
