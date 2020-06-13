@@ -16,6 +16,7 @@ export type Query = {
   hello: Scalars['String']
   bye: Scalars['String']
   users: Array<User>
+  userCountByDate: Array<UsersCount>
   topics: Array<Topic>
   resources: Array<Resource>
   primaryResourceBySlug: Resource
@@ -36,6 +37,7 @@ export type Query = {
   userProgress?: Maybe<Progress>
   userProgressByResourceId?: Maybe<Progress>
   userProgressList: Array<Progress>
+  userProgressListByUsername: Array<Progress>
   hasEnrolled: Scalars['Boolean']
   hasEnrolledByResourceId: Scalars['Boolean']
   hasCompletedSection: Scalars['Boolean']
@@ -98,6 +100,10 @@ export type QueryUserProgressArgs = {
 
 export type QueryUserProgressByResourceIdArgs = {
   resourceId: Scalars['String']
+}
+
+export type QueryUserProgressListByUsernameArgs = {
+  username: Scalars['String']
 }
 
 export type QueryHasEnrolledArgs = {
@@ -282,6 +288,12 @@ export type ProfessionalDetails = {
   currentRole?: Maybe<Scalars['String']>
   lookingForJob?: Maybe<Scalars['Boolean']>
   location?: Maybe<Scalars['String']>
+}
+
+export type UsersCount = {
+  __typename?: 'UsersCount'
+  createdDate: Scalars['DateTime']
+  count?: Maybe<Scalars['Float']>
 }
 
 export type Mutation = {

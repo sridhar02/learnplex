@@ -16,7 +16,6 @@ import { useRouter } from 'next/router'
 
 import { FORM_LAYOUT, FORM_TAIL_LAYOUT } from '../../constants'
 import { SEO } from '../../components/SEO'
-import Enrollments from '../../components/user/Enrollments'
 import NotAuthenticated from '../../components/result/NotAuthenticated'
 import {
   resendVerificationEmail as resendEmail,
@@ -33,7 +32,6 @@ export default function ProfileSettings() {
 
   const BASIC = 'basic'
   const SECURITY = 'security'
-  const ENROLLMENTS = 'enrollments'
   const [selectedKey, setSelectedKey] = useState(BASIC)
 
   const [updatePasswordForm] = Form.useForm()
@@ -97,7 +95,6 @@ export default function ProfileSettings() {
           >
             <Menu.Item key={'basic'}>Basic Settings</Menu.Item>
             <Menu.Item key={'security'}>Security Settings</Menu.Item>
-            <Menu.Item key={'enrollments'}>Enrollments</Menu.Item>
           </Menu>
         </Col>
         <Col sm={16} md={18} lg={17} xs={24}>
@@ -278,7 +275,6 @@ export default function ProfileSettings() {
               </Form.Item>
             </Form>
           )}
-          {selectedKey === ENROLLMENTS && <Enrollments />}
         </Col>
       </Row>
     </>
