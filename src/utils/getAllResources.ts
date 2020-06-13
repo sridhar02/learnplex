@@ -1,12 +1,8 @@
-import { Client } from '@urql/core'
+// import { Client } from '@urql/core'
 
-import { client as defaultClient } from './urqlClient'
+import { client } from './urqlClient'
 
-export async function getAllResources({
-  client = defaultClient,
-}: {
-  client?: Client
-}) {
+export async function getAllResources() {
   const ALL_RESOURCES_FOR_ADMIN_QUERY = `
     query {
       allResourcesForAdmin {

@@ -1,17 +1,16 @@
-import { useQuery } from 'urql'
-import React from 'react'
-import { Skeleton } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { message, Typography } from 'antd'
 
-import NotAuthenticated from '../../components/result/NotAuthenticated'
-import InternalServerError from '../../components/result/InternalServerError'
-import { Progress } from '../../graphql/types'
+import { Progress, User } from '../../graphql/types'
 import ResourceCards from '../../components/learn/ResourceCards'
+import { client } from '../../utils/urqlClient'
 import { useAuthUser } from '../../lib/store'
 
-export default function Enrollments() {
-  const USER_PROGRESS_LIST_QUERY = `
-    query {
-      userProgressList {
+export default function Enrollments({ user }: { user: Partial<User> }) {
+  const loggedInUser = useAuthUser((state) => state.user)
+  const USER_PROGRESS_LIST_BY_USERNAME_QUERY = `
+    query($username: String!) {
+      userProgressListByUsername(username: $username) {
         resource {
           id
           title
@@ -30,27 +29,38 @@ export default function Enrollments() {
       }
     }
   `
-  const [
-    { data: progressData, fetching: progressFetching, error: progressError },
-  ] = useQuery({
-    query: USER_PROGRESS_LIST_QUERY,
-  })
-  const user = useAuthUser((state) => state.user)
+  const [resources, setResources] = useState([])
 
-  if (progressFetching) {
-    return <Skeleton active={true} />
+  useEffect(() => {
+    client
+      .query(USER_PROGRESS_LIST_BY_USERNAME_QUERY, {
+        username: user.username,
+      })
+      .toPromise()
+      .then((result) => {
+        if (result.error) {
+          message.error(result.error.message)
+        } else {
+          setResources(
+            result.data.userProgressListByUsername.map(
+              (progress: Progress) => progress.resource
+            )
+          )
+        }
+      })
+  }, [USER_PROGRESS_LIST_BY_USERNAME_QUERY, user.username])
+  if (resources.length === 0) {
+    return <></>
   }
 
-  if (!user) {
-    return <NotAuthenticated />
-  }
-
-  if (progressError) {
-    return <InternalServerError />
-  }
-
-  const progressList = progressData.userProgressList
-  const resources = progressList.map((progress: Progress) => progress.resource)
-
-  return <ResourceCards resources={resources} />
+  return (
+    <>
+      <Typography.Title level={2}>
+        {loggedInUser?.id?.toString() === user.id?.toString()
+          ? `Resource you are learning`
+          : `Resources ${user.name ?? user.username} is learning`}{' '}
+      </Typography.Title>
+      <ResourceCards resources={resources} />
+    </>
+  )
 }
