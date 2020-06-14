@@ -6,6 +6,7 @@
     "node": ">=12.x"
   },
   "scripts": {
+    "deploy": "npx serverless",
     "test": "is-ci test:coverage test:watch",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
