@@ -56,7 +56,7 @@ export default function Home() {
 
   return (
     <>
-      <SEO title={'Index'} />
+      <SEO title={'Home'} />
       <ResourceCards resources={resources} />
     </>
   )
